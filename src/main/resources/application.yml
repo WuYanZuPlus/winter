@@ -1,6 +1,24 @@
 spring:
-  datasource:
-    driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/unexadmin_local_develop?characterEncoding=UTF-8&useSSL=false
-    username: root
-    password: 123456
+  application:
+    name: WINTER
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://localhost:3306/db?characterEncoding=UTF-8&useSSL=false
+#    username: root
+#    password: 123456
+server:
+  port: 8089
+  servlet:
+    context-path: /winter
+    session:
+      timeout: 60m
+eureka:
+  client:
+    register-with-eureka: true
+    serviceUrl:
+      defaultZone: http://eureka-sit.xxx.com/eureka/
+  instance:
+      prefer-ip-address: true #以IP地址注册到服务中心，相互注册使用IP地址
+      instance-id: ${spring.cloud.client.ip-address}:${server.port}
+      lease-expiration-duration-in-seconds: 5
+      lease-renewal-interval-in-seconds: 3
