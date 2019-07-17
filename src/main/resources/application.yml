@@ -15,7 +15,7 @@ spring:
         max-wait: 1s #最大等待时间 （使用负值表示没有限制）
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/unexadmin_local_develop?characterEncoding=UTF-8&useSSL=false
+    url: jdbc:mysql://localhost:3306/local_develop?characterEncoding=UTF-8&useSSL=false
     username: root
     password: 123456
 server:
