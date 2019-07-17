@@ -1,9 +1,7 @@
 package com.jianghu.winter.redis;
 
 import com.jianghu.winter.WinterApplication;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,7 +31,7 @@ public class RedisTemplateUtilTest {
     private static final String USER2 = "winter:test:user2";
 
     @Resource
-    private RedisTemplateUtil<Object, Object> redisTemplateUtil;
+    private RedisTemplateUtil<String, Object> redisTemplateUtil;
 
     @Test
     public void test_string_string() {
@@ -58,7 +56,6 @@ public class RedisTemplateUtilTest {
 
     @Getter
     @Setter
-    @Builder
     static class User implements Serializable {
         String name;
         int age;
@@ -66,9 +63,16 @@ public class RedisTemplateUtilTest {
 
     @Test
     public void test_string_object() {
+        User user1 = new User();
+        user1.name = "zhangsan";
+        user1.age = 15;
 
-        redisTemplateUtil.set(USER1, User.builder().name("zhangsan").age(15).build());
-        redisTemplateUtil.set(USER2, User.builder().name("lisi").age(20).build());
+        User user2 = new User();
+        user2.name = "lisi";
+        user2.age = 20;
+
+        redisTemplateUtil.set(USER1, user1);
+        redisTemplateUtil.set(USER2, user2);
 
         assertTrue(redisTemplateUtil.exists(USER1));
         assertTrue(redisTemplateUtil.exists(USER2));

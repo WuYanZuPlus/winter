@@ -24,7 +24,7 @@ public class RedisConfig {
      * @return
      */
     @Bean
-    public RedisTemplate<String, Object> redisCacheTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
+    public RedisTemplate<String, Object> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         // 将刚才的redis连接工厂设置到模板类中
         template.setConnectionFactory(lettuceConnectionFactory);

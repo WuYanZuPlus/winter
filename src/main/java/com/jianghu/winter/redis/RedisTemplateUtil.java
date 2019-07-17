@@ -1,5 +1,6 @@
 package com.jianghu.winter.redis;
 
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
@@ -43,22 +44,23 @@ public class RedisTemplateUtil<K, V> {
     /**
      * 读取缓存
      *
+     * @param key 键
+     */
+    public Object get(final K key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 读取缓存
+     *
      * @param key   键
      * @param clazz 指定clazz
      * @return class
      */
     @SuppressWarnings("unchecked")
     public <T> T get(final K key, Class<T> clazz) {
-        return (T) redisTemplate.boundValueOps(key).get();
-    }
-
-    /**
-     * 读取缓存
-     *
-     * @param key 键
-     */
-    public Object get(final K key) {
-        return redisTemplate.boundValueOps(key).get();
+        V v = redisTemplate.opsForValue().get(key);
+        return JSONObject.parseObject(JSONObject.toJSONString(v), clazz);
     }
 
     /**
