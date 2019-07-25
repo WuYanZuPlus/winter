@@ -54,6 +54,9 @@ public class RedisTemplateUtilTest {
 
     }
 
+    /**
+     * 在序列化和反序列化时，Java实体类需要一个无参的构造方法
+     */
     @Getter
     @Setter
     static class User implements Serializable {

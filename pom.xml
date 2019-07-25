@@ -64,11 +64,6 @@
             <artifactId>mysql-connector-java</artifactId>
             <scope>runtime</scope>
         </dependency>
-        <dependency>
-            <groupId>org.apache.rocketmq</groupId>
-            <artifactId>rocketmq-client</artifactId>
-            <version>4.2.0</version>
-        </dependency>
         <!--spring boot-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
