@@ -34,4 +34,7 @@ eureka:
     instance-id: ${spring.cloud.client.ip-address}:${server.port}
     lease-expiration-duration-in-seconds: 5
     lease-renewal-interval-in-seconds: 3
-
+rocketmq:
+  name-server: 127.0.0.1:9876
+  producer:
+    group: group-winter
