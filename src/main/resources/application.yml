@@ -38,3 +38,4 @@ rocketmq:
   name-server: 127.0.0.1:9876
   producer:
     group: group-winter
+winter.gateway.url: http://gateway-sit.xxx.com/openapi/
