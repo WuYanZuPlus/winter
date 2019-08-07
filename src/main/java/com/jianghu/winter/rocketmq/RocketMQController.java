@@ -26,8 +26,8 @@ public class RocketMQController {
         String topic1 = "topic-test1";
         String message1 = "message1";
         rocketMQTemplate.convertAndSend(topic1, message1);
-        rocketMQTemplate.convertAndSend(topic1 + ":tag1", message1 + "else1");
-        rocketMQTemplate.convertAndSend(topic1 + ":tag2", message1 + "else2");
+        rocketMQTemplate.convertAndSend(topic1 + ":tag1", message1 + "tag1content");
+        rocketMQTemplate.convertAndSend(topic1 + ":tag2", message1 + "tag2content");
         log.info("生产者生产第一个消息完成: 主题:{}, 内容:{}", topic1, message1);
 
         String topic2 = "topic-test2";
