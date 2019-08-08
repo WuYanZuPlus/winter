@@ -1,5 +1,6 @@
 package com.jianghu.winter.redis;
 
+import com.alibaba.fastjson.JSONObject;
 import com.jianghu.winter.WinterApplication;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +55,6 @@ public class RedisCacheTest {
         user.name = "daniel";
         user.age = 15;
         cache.put("key2", user);
-
         User userEntity = cache.get("key2", User.class);
 
         assertThat(userEntity)
