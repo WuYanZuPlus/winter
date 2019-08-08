@@ -1,6 +1,5 @@
 package com.jianghu.winter.redis;
 
-import com.alibaba.fastjson.JSONObject;
 import com.jianghu.winter.WinterApplication;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,8 +12,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.test.context.junit4.SpringRunner;
-
-import java.io.Serializable;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
 
