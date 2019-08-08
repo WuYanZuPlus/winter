@@ -42,7 +42,7 @@ public class RedisCacheTest {
      */
     @Getter
     @Setter
-    static class User implements Serializable {
+    static class User {
         String name;
         int age;
     }
