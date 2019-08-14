@@ -5,8 +5,13 @@
     <groupId>com.jianghu.winter</groupId>
     <artifactId>winter</artifactId>
     <version>${revision}</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
     <name>winter</name>
+
+    <modules>
+        <module>winter-config</module>
+        <module>winter-web</module>
+    </modules>
 
     <properties>
         <repo>-SNAPSHOT</repo>

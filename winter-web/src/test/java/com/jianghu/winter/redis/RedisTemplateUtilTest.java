@@ -1,7 +1,8 @@
 package com.jianghu.winter.redis;
 
 import com.jianghu.winter.WinterApplication;
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,9 +13,7 @@ import java.io.Serializable;
 import javax.annotation.Resource;
 
 import static org.assertj.core.api.Java6Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 
 /**
