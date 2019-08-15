@@ -1,7 +1,7 @@
 package com.jianghu.winter.remote;
 
-import com.jianghu.winter.common.PageResponse;
-import com.jianghu.winter.common.RemoteResponse;
+import com.jianghu.winter.config.remote.PageResponse;
+import com.jianghu.winter.config.remote.RemoteResponse;
 import io.swagger.annotations.Api;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

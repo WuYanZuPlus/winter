@@ -1,7 +1,7 @@
 package com.jianghu.winter.remote;
 
-import com.jianghu.winter.common.PageResponse;
-import com.jianghu.winter.common.RemoteResponse;
+import com.jianghu.winter.config.remote.PageResponse;
+import com.jianghu.winter.config.remote.RemoteResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

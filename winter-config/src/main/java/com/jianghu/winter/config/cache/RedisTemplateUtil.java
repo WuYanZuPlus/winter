@@ -1,4 +1,4 @@
-package com.jianghu.winter.redis;
+package com.jianghu.winter.config.cache;
 
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.data.redis.core.RedisTemplate;

@@ -1,4 +1,4 @@
-package com.jianghu.winter.remote;
+package com.jianghu.winter.config.remote;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

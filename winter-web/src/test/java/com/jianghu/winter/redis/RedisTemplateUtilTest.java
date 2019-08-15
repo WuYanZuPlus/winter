@@ -1,6 +1,7 @@
 package com.jianghu.winter.redis;
 
 import com.jianghu.winter.WinterApplication;
+import com.jianghu.winter.config.cache.RedisTemplateUtil;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;

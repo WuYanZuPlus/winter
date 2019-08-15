@@ -1,4 +1,4 @@
-package com.jianghu.winter.redis;
+package com.jianghu.winter.config.cache;
 
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration;

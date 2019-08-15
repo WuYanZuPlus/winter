@@ -1,4 +1,4 @@
-package com.jianghu.winter.redis;
+package com.jianghu.winter.config.cache;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
