@@ -11,6 +11,7 @@
     <modules>
         <module>winter-config</module>
         <module>winter-web</module>
+        <module>winter-query</module>
     </modules>
 
     <properties>
