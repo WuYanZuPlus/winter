@@ -21,6 +21,15 @@ public class QueryBuilderTest {
     public void buildSelectWithWhere() {
         QueryBuilder queryBuilder = new QueryBuilder();
         UserQuery byAccount = UserQuery.builder().account("daniel").build();
-        assertEquals("SELECT * FROM t_user WHERE account = #{account}", queryBuilder.buildSelect(byAccount));
+        String actualSql = queryBuilder.buildSelect(byAccount);
+        assertEquals("SELECT * FROM t_user WHERE account = #{account}", actualSql);
+    }
+
+    @Test
+    public void buildSelectWithWheres() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery byAccount = UserQuery.builder().account("daniel").userName("赵子龙").build();
+        String actualSql = queryBuilder.buildSelect(byAccount);
+        assertEquals("SELECT * FROM t_user WHERE account = #{account} AND user_name = #{userName}", actualSql);
     }
 }

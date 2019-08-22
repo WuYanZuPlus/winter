@@ -15,4 +15,5 @@ import lombok.Setter;
 @QueryTable(table = "t_user")
 public class UserQuery {
     private String account;
+    private String userName;
 }

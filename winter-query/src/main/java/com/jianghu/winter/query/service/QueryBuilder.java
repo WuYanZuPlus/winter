@@ -1,6 +1,7 @@
 package com.jianghu.winter.query.service;
 
 import com.jianghu.winter.query.annotation.QueryTable;
+import com.jianghu.winter.query.core.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -28,7 +29,8 @@ public class QueryBuilder {
             if (value == null) {
                 continue;
             }
-            whereList.add(field.getName() + " = " + "#{" + field.getName() + "}");
+            String columnName = CommonUtil.camelCaseToUnderscore(field.getName());
+            whereList.add(columnName + " = " + "#{" + field.getName() + "}");
         }
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
