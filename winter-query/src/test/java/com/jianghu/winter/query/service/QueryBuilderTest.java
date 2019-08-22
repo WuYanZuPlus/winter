@@ -13,6 +13,14 @@ public class QueryBuilderTest {
     @Test
     public void buildSelect() {
         QueryBuilder queryBuilder = new QueryBuilder();
-        assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(UserQuery.builder().build()));
+        UserQuery build = UserQuery.builder().build();
+        assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(build));
+    }
+
+    @Test
+    public void buildSelectWithWhere() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery byAccount = UserQuery.builder().account("daniel").build();
+        assertEquals("SELECT * FROM t_user WHERE account = #{account}", queryBuilder.buildSelect(byAccount));
     }
 }
