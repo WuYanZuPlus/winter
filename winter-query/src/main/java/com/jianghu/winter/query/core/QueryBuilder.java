@@ -1,7 +1,6 @@
-package com.jianghu.winter.query.service;
+package com.jianghu.winter.query.core;
 
 import com.jianghu.winter.query.annotation.QueryTable;
-import com.jianghu.winter.query.core.CommonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
@@ -16,13 +15,13 @@ import java.util.List;
  */
 @Slf4j
 public class QueryBuilder {
+
     public String buildSelect(Object query) {
         QueryTable queryTable = query.getClass().getAnnotation(QueryTable.class);
         if (queryTable == null) {
             throw new IllegalStateException("@QueryTable annotation unConfigured!");
         }
         String selectSql = "SELECT * FROM " + queryTable.table();
-        // build whereSql
         List<Object> whereList = new LinkedList<>();
         for (Field field : query.getClass().getDeclaredFields()) {
             Object value = readFieldValue(query, field);
@@ -34,7 +33,14 @@ public class QueryBuilder {
         }
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
-            return selectSql + whereSql;
+            selectSql += whereSql;
+        }
+        if (query instanceof PageQuery) {
+            PageQuery pageQuery = (PageQuery) query;
+            if (pageQuery.needPaging()) {
+                String pageSql = " LIMIT " + pageQuery.getOffset() + "," + pageQuery.getPageSize();
+                selectSql += pageSql;
+            }
         }
         return selectSql;
     }

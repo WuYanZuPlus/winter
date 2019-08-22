@@ -1,6 +1,7 @@
 package com.jianghu.winter.query.service;
 
 import com.jianghu.winter.query.annotation.QueryTable;
+import com.jianghu.winter.query.core.PageQuery;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Builder
 @QueryTable(table = "t_user")
-public class UserQuery {
+public class UserQuery extends PageQuery {
     private String account;
     private String userName;
 }
