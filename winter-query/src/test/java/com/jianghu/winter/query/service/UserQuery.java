@@ -17,4 +17,5 @@ import lombok.Setter;
 public class UserQuery extends PageQuery {
     private String account;
     private String userName;
+    private String userNameLike;
 }

@@ -21,7 +21,7 @@ public class QueryBuilderTest {
     }
 
     @Test
-    public void buildSelectWithWhere() {
+    public void Where() {
         QueryBuilder queryBuilder = new QueryBuilder();
         UserQuery byAccount = UserQuery.builder().account(ACCOUNT).build();
         String actualSql = queryBuilder.buildSelect(byAccount);
@@ -29,14 +29,14 @@ public class QueryBuilderTest {
     }
 
     @Test
-    public void buildSelectWithWheres() {
+    public void Wheres() {
         QueryBuilder queryBuilder = new QueryBuilder();
         UserQuery userQuery = UserQuery.builder().account(ACCOUNT).userName("赵子龙").build();
         assertEquals("SELECT * FROM t_user WHERE account = #{account} AND user_name = #{userName}", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void buildSelectWithWheresAndPage() {
+    public void WheresAndPage() {
         QueryBuilder queryBuilder = new QueryBuilder();
         UserQuery userQuery = UserQuery.builder().account(ACCOUNT).userName("赵子龙").build();
         userQuery.setPageNumber(0);
@@ -44,10 +44,19 @@ public class QueryBuilderTest {
     }
 
     @Test
-    public void buildSelectWithWheresAndSort() {
+    public void Sort() {
         QueryBuilder queryBuilder = new QueryBuilder();
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setSort("user_name DESC");
         assertEquals("SELECT * FROM t_user ORDER BY user_name DESC", queryBuilder.buildSelect(userQuery));
     }
+
+    @Test
+    public void WhereAndLike() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setUserNameLike("da");
+        assertEquals("SELECT * FROM t_user WHERE user_name LIKE #{userNameLike}", queryBuilder.buildSelect(userQuery));
+    }
+
 }
