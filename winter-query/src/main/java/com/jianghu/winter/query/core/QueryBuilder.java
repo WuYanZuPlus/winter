@@ -37,6 +37,9 @@ public class QueryBuilder {
         }
         if (query instanceof PageQuery) {
             PageQuery pageQuery = (PageQuery) query;
+            if (StringUtils.isNotBlank(pageQuery.getSort())) {
+                selectSql += " ORDER BY " + pageQuery.getSort();
+            }
             if (pageQuery.needPaging()) {
                 String pageSql = " LIMIT " + pageQuery.getOffset() + "," + pageQuery.getPageSize();
                 selectSql += pageSql;

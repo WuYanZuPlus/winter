@@ -42,4 +42,12 @@ public class QueryBuilderTest {
         userQuery.setPageNumber(0);
         assertEquals("SELECT * FROM t_user WHERE account = #{account} AND user_name = #{userName} LIMIT 0,10", queryBuilder.buildSelect(userQuery));
     }
+
+    @Test
+    public void buildSelectWithWheresAndSort() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setSort("user_name DESC");
+        assertEquals("SELECT * FROM t_user ORDER BY user_name DESC", queryBuilder.buildSelect(userQuery));
+    }
 }
