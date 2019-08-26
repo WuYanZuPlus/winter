@@ -6,9 +6,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import javax.annotation.Resource;
 
 /**
  * @author daniel.hu
@@ -16,6 +18,9 @@ import java.util.List;
  */
 @Slf4j
 public class QueryBuilder {
+
+    @Resource
+    private Map<String, Processor> suffixProcessorMap = new ConcurrentHashMap<>();
 
     public String buildSelect(Object query) {
         String selectSql = buildStartSql(query);
@@ -37,32 +42,16 @@ public class QueryBuilder {
     }
 
     private String buildWhereSql(String selectSql, Object query) {
-        List<Object> whereList = new LinkedList<>();
+        List<String> whereList = new LinkedList<>();
         for (Field field : query.getClass().getDeclaredFields()) {
             Object value = readFieldValue(query, field);
             if (value == null) {
                 continue;
             }
             String fieldName = field.getName();
-            if (fieldName.endsWith("Like")) {
-                String columnName = CommonUtil.camelCaseToUnderscore(StringUtils.substringBeforeLast(fieldName, "Like"));
-                whereList.add(columnName + " LIKE " + "#{" + fieldName + "}");
-            } else if (fieldName.endsWith("In")) {
-                String columnName = CommonUtil.camelCaseToUnderscore(StringUtils.substringBeforeLast(fieldName, "In"));
-                List<Object> list = new LinkedList<>();
-                if (value instanceof Collection) {
-                    Collection collection = (Collection) value;
-                    if (!collection.isEmpty()) {
-                        for (int i = 0; i < collection.size(); i++) {
-                            list.add("#{" + fieldName + "[" + i + "]" + "}");
-                        }
-                        whereList.add(columnName + " IN " + "(" + StringUtils.join(list, ", ") + ")");
-                    }
-                }
-            } else {
-                String columnName = CommonUtil.camelCaseToUnderscore(fieldName);
-                whereList.add(columnName + " = " + "#{" + fieldName + "}");
-            }
+            QuerySuffixEnum conditionEnum = QuerySuffixEnum.resolve(fieldName);
+            String key = conditionEnum.name().toLowerCase() + Processor.class.getSimpleName();
+            suffixProcessorMap.get(key).process(whereList, value, fieldName);
         }
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
