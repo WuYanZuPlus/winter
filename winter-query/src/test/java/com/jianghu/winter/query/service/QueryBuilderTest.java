@@ -3,6 +3,9 @@ package com.jianghu.winter.query.service;
 import com.jianghu.winter.query.core.QueryBuilder;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -57,6 +60,22 @@ public class QueryBuilderTest {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setUserNameLike("da");
         assertEquals("SELECT * FROM t_user WHERE user_name LIKE #{userNameLike}", queryBuilder.buildSelect(userQuery));
+    }
+
+    @Test
+    public void WhereAndIn() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setIdIn(Arrays.asList(1, 2, 3));
+        assertEquals("SELECT * FROM t_user WHERE id IN (#{idIn[0]}, #{idIn[1]}, #{idIn[2]})", queryBuilder.buildSelect(userQuery));
+    }
+
+    @Test
+    public void WhereAndIn2() {
+        QueryBuilder queryBuilder = new QueryBuilder();
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setIdIn(new ArrayList<>());
+        assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(userQuery));
     }
 
 }

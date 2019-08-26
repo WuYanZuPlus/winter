@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+
 /**
  * @author daniel.hu
  * @date 2019/8/22 11:12
@@ -18,4 +20,5 @@ public class UserQuery extends PageQuery {
     private String account;
     private String userName;
     private String userNameLike;
+    private Collection<Integer> idIn;
 }

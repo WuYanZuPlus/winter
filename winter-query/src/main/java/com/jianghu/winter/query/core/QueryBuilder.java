@@ -40,13 +40,25 @@ public class QueryBuilder {
         List<Object> whereList = new LinkedList<>();
         for (Field field : query.getClass().getDeclaredFields()) {
             Object value = readFieldValue(query, field);
-            if (value == null || (value instanceof Collection && ((Collection) value).isEmpty())) {
+            if (value == null) {
                 continue;
             }
             String fieldName = field.getName();
             if (fieldName.endsWith("Like")) {
                 String columnName = CommonUtil.camelCaseToUnderscore(StringUtils.substringBeforeLast(fieldName, "Like"));
                 whereList.add(columnName + " LIKE " + "#{" + fieldName + "}");
+            } else if (fieldName.endsWith("In")) {
+                String columnName = CommonUtil.camelCaseToUnderscore(StringUtils.substringBeforeLast(fieldName, "In"));
+                List<Object> list = new LinkedList<>();
+                if (value instanceof Collection) {
+                    Collection collection = (Collection) value;
+                    if (!collection.isEmpty()) {
+                        for (int i = 0; i < collection.size(); i++) {
+                            list.add("#{" + fieldName + "[" + i + "]" + "}");
+                        }
+                        whereList.add(columnName + " IN " + "(" + StringUtils.join(list, ", ") + ")");
+                    }
+                }
             } else {
                 String columnName = CommonUtil.camelCaseToUnderscore(fieldName);
                 whereList.add(columnName + " = " + "#{" + fieldName + "}");
