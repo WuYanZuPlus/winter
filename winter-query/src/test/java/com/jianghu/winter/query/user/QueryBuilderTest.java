@@ -1,15 +1,11 @@
 package com.jianghu.winter.query.user;
 
-import com.jianghu.winter.query.core.Processor;
 import com.jianghu.winter.query.core.QueryBuilder;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -23,14 +19,8 @@ public class QueryBuilderTest {
     private QueryBuilder queryBuilder;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         queryBuilder = new QueryBuilder();
-        Map<String, Processor> suffixProcessorMap = new HashMap<>();
-        suffixProcessorMap.put("defaultProcessor", new Processor.DefaultProcessor());
-        suffixProcessorMap.put("inProcessor", new Processor.InProcessor());
-        suffixProcessorMap.put("likeProcessor", new Processor.LikeProcessor());
-
-        FieldUtils.writeField(queryBuilder, "suffixProcessorMap", suffixProcessorMap, true);
     }
 
     @Test

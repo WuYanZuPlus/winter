@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.annotation.Resource;
 
 /**
  * @author daniel.hu
@@ -19,11 +18,24 @@ import javax.annotation.Resource;
 @Slf4j
 public class QueryBuilder {
 
-    @Resource
-    private Map<String, Processor> suffixProcessorMap = new ConcurrentHashMap<>();
+    private static final Map<String, Processor> suffixProcessorMap = new ConcurrentHashMap<>();
+
+    static {
+        suffixProcessorMap.put("defaultProcessor", new Processor.DefaultProcessor());
+        suffixProcessorMap.put("inProcessor", new Processor.InProcessor());
+        suffixProcessorMap.put("likeProcessor", new Processor.LikeProcessor());
+    }
 
     public String buildSelect(Object query) {
-        String selectSql = buildStartSql(query);
+        return build(query, "*");
+    }
+
+    public String buildCount(Object query) {
+        return build(query, "COUNT(*)");
+    }
+
+    private String build(Object query, String operation) {
+        String selectSql = buildStartSql(query, operation);
         selectSql = buildWhereSql(selectSql, query);
         if (query instanceof PageQuery) {
             PageQuery pageQuery = (PageQuery) query;
@@ -33,12 +45,12 @@ public class QueryBuilder {
         return selectSql;
     }
 
-    private String buildStartSql(Object query) {
+    private String buildStartSql(Object query, String operation) {
         QueryTable queryTable = query.getClass().getAnnotation(QueryTable.class);
         if (queryTable == null) {
             throw new IllegalStateException("@QueryTable annotation unConfigured!");
         }
-        return "SELECT * FROM " + queryTable.table();
+        return "SELECT " + operation + " FROM " + queryTable.table();
     }
 
     private String buildWhereSql(String selectSql, Object query) {

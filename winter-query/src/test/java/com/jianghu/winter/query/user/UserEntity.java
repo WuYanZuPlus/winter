@@ -25,5 +25,5 @@ public class UserEntity {
     private String email;
     @Column(name = "nick_name")
     private String nickName;
-    private String valid;
+    private boolean valid;
 }
