@@ -93,4 +93,10 @@ public class MybatisTest {
         userMapper.delete(1);
         assertNull(userMapper.get(1));
     }
+
+    @Test
+    public void test_deleteByQuery() {
+        userMapper.deleteByQuery(UserQuery.builder().account("daniel").build());
+        assertNull(userMapper.get(1));
+    }
 }

@@ -36,51 +36,58 @@ public class QueryBuilderTest {
     }
 
     @Test
-    public void Where() {
+    public void where() {
         UserQuery byAccount = UserQuery.builder().account(ACCOUNT).build();
         String actualSql = queryBuilder.buildSelect(byAccount);
         assertEquals("SELECT * FROM t_user WHERE account = #{account}", actualSql);
     }
 
     @Test
-    public void Wheres() {
+    public void wheres() {
         UserQuery userQuery = UserQuery.builder().account(ACCOUNT).userName("赵子龙").build();
         assertEquals("SELECT * FROM t_user WHERE account = #{account} AND user_name = #{userName}", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void WheresAndPage() {
+    public void wheresAndPage() {
         UserQuery userQuery = UserQuery.builder().account(ACCOUNT).userName("赵子龙").build();
         userQuery.setPageNumber(0);
         assertEquals("SELECT * FROM t_user WHERE account = #{account} AND user_name = #{userName} LIMIT 0,10", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void Sort() {
+    public void sort() {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setSort("user_name DESC");
         assertEquals("SELECT * FROM t_user ORDER BY user_name DESC", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void WhereAndLike() {
+    public void whereAndLike() {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setUserNameLike("da");
         assertEquals("SELECT * FROM t_user WHERE user_name LIKE #{userNameLike}", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void WhereAndIn() {
+    public void whereAndIn() {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setIdIn(Arrays.asList(1, 2, 3));
         assertEquals("SELECT * FROM t_user WHERE id IN (#{idIn[0]}, #{idIn[1]}, #{idIn[2]})", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
-    public void WhereAndIn2() {
+    public void whereAndIn2() {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setIdIn(new ArrayList<>());
         assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(userQuery));
     }
+
+    @Test
+    public void deleteAndWhere() {
+        UserQuery userQuery = UserQuery.builder().account(ACCOUNT).build();
+        assertEquals("DELETE FROM t_user WHERE account = #{account}", queryBuilder.buildDelete(userQuery));
+    }
+
 
 }

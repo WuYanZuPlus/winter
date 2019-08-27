@@ -26,4 +26,7 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
     @Lang(MapperTableDriver.class)
     @Select("DELETE FROM @{table} WHERE id = #{id}")
     void delete(@Param("id") I id);
+
+    @SelectProvider(type = QueryBuilder.class, method = "buildDelete")
+    void deleteByQuery(Q query);
 }

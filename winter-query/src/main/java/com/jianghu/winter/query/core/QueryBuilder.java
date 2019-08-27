@@ -27,11 +27,16 @@ public class QueryBuilder {
     }
 
     public String buildSelect(Object query) {
-        return build(query, "*");
+        return build(query, "SELECT *");
     }
 
     public String buildCount(Object query) {
-        return build(query, "COUNT(*)");
+        return build(query, "SELECT COUNT(*)");
+    }
+
+    public String buildDelete(Object query) {
+        String deleteSql = buildStartSql(query, "DELETE");
+        return buildWhereSql(deleteSql, query);
     }
 
     private String build(Object query, String operation) {
@@ -50,7 +55,7 @@ public class QueryBuilder {
         if (queryTable == null) {
             throw new IllegalStateException("@QueryTable annotation unConfigured!");
         }
-        return "SELECT " + operation + " FROM " + queryTable.table();
+        return operation + " FROM " + queryTable.table();
     }
 
     private String buildWhereSql(String selectSql, Object query) {
