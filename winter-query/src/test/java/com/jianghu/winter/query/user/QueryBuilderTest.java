@@ -1,4 +1,4 @@
-package com.jianghu.winter.query.service;
+package com.jianghu.winter.query.user;
 
 import com.jianghu.winter.query.core.Processor;
 import com.jianghu.winter.query.core.QueryBuilder;
