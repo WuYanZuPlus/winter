@@ -18,6 +18,7 @@ import java.sql.Connection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * @author daniel.hu
@@ -53,7 +54,7 @@ public class MybatisTest {
     @Test
     public void test_select() {
         List<UserEntity> entities = userMapper.query(UserQuery.builder().build());
-        log.debug("query response:\n{}", JSON.toJSONString(entities, true));
+        log.info("query response:\n{}", JSON.toJSONString(entities, true));
         assertEquals(4, entities.size());
     }
 
@@ -69,7 +70,7 @@ public class MybatisTest {
         query.setPageNumber(0);
         query.setPageSize(2);
         PageList<UserEntity> page = userMapper.page(query);
-        log.debug("page response:\n{}", JSON.toJSONString(page, true));
+        log.info("page response:\n{}", JSON.toJSONString(page, true));
         assertEquals(4, page.total);
         assertEquals(2, page.getList().size());
     }
@@ -80,4 +81,16 @@ public class MybatisTest {
         assertEquals(1, entities.size());
     }
 
+    @Test
+    public void test_getById() {
+        UserEntity userEntity = userMapper.get(1);
+        log.info("entity:\n{}", JSON.toJSONString(userEntity, true));
+        assertEquals("daniel", userEntity.getAccount());
+    }
+
+    @Test
+    public void test_delete() {
+        userMapper.delete(1);
+        assertNull(userMapper.get(1));
+    }
 }

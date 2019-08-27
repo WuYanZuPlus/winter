@@ -1,12 +1,14 @@
 package com.jianghu.winter.query.core;
 
+import org.apache.ibatis.annotations.Param;
+
 import java.util.List;
 
 /**
  * @author daniel.hu
  * @date 2019/8/27 16:24
  */
-public interface DataService<E, Q> {
+public interface DataService<E, I, Q> {
 
     List<E> query(Q query);
 
@@ -15,5 +17,9 @@ public interface DataService<E, Q> {
     default PageList<E> page(Q query) {
         return new PageList<>(query(query), count(query));
     }
+
+    E get(@Param("id") I id);
+
+    void delete(@Param("id") I id);
 
 }

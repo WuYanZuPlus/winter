@@ -1,5 +1,6 @@
 package com.jianghu.winter.query.user;
 
+import com.jianghu.winter.query.annotation.MapperTable;
 import com.jianghu.winter.query.core.QueryMapper;
 import org.apache.ibatis.annotations.Mapper;
 
@@ -8,6 +9,7 @@ import org.apache.ibatis.annotations.Mapper;
  * @date 2019/8/27 10:19
  */
 @Mapper
-public interface UserMapper extends QueryMapper<UserEntity,UserQuery> {
+@MapperTable("t_user")
+public interface UserMapper extends QueryMapper<UserEntity, Integer, UserQuery> {
 
 }

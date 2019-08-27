@@ -30,6 +30,12 @@ public class QueryBuilderTest {
     }
 
     @Test
+    public void buildCount() {
+        UserQuery build = UserQuery.builder().build();
+        assertEquals("SELECT COUNT(*) FROM t_user", queryBuilder.buildCount(build));
+    }
+
+    @Test
     public void Where() {
         UserQuery byAccount = UserQuery.builder().account(ACCOUNT).build();
         String actualSql = queryBuilder.buildSelect(byAccount);
