@@ -20,6 +20,10 @@ public interface DataService<E, I, Q> {
 
     E get(@Param("id") I id);
 
+    default E getByQuery(Q query) {
+        return CommonUtil.first(query(query));
+    }
+
     void delete(@Param("id") I id);
 
     void deleteByQuery(Q query);

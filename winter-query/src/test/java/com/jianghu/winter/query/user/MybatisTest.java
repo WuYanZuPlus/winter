@@ -15,6 +15,7 @@ import org.junit.Test;
 
 import java.io.Reader;
 import java.sql.Connection;
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -103,4 +104,17 @@ public class MybatisTest {
         userMapper.deleteByQuery(UserQuery.builder().account("daniel").build());
         assertNull(userMapper.get(1));
     }
+
+    @Test
+    public void test_getByQuery() {
+        UserEntity entity = userMapper.getByQuery(UserQuery.builder().userNameLike("张").build());
+        assertEquals("user2", entity.getAccount());
+    }
+
+    @Test
+    public void test_in() {
+        List<UserEntity> entities = userMapper.query(UserQuery.builder().idIn(Arrays.asList(1, 2)).build());
+        assertEquals(2, entities.size());
+    }
+
 }

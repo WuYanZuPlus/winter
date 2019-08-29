@@ -61,14 +61,14 @@ public class QueryBuilder {
     private String buildWhereSql(String selectSql, Object query) {
         List<String> whereList = new LinkedList<>();
         for (Field field : query.getClass().getDeclaredFields()) {
-            Object value = readFieldValue(query, field);
-            if (value == null) {
+            Object fieldValue = readFieldValue(query, field);
+            if (fieldValue == null) {
                 continue;
             }
             String fieldName = field.getName();
             QuerySuffixEnum conditionEnum = QuerySuffixEnum.resolve(fieldName);
             String key = conditionEnum.name().toLowerCase() + Processor.class.getSimpleName();
-            suffixProcessorMap.get(key).process(whereList, value, fieldName);
+            suffixProcessorMap.get(key).process(whereList, query, fieldName, fieldValue);
         }
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
