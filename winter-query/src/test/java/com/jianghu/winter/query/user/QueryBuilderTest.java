@@ -25,14 +25,17 @@ public class QueryBuilderTest {
 
     @Test
     public void buildSelect() {
-        UserQuery build = UserQuery.builder().build();
-        assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(build));
+        UserQuery userQuery = UserQuery.builder().build();
+        assertEquals("SELECT * FROM t_user", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
     public void buildCount() {
-        UserQuery build = UserQuery.builder().build();
-        assertEquals("SELECT COUNT(*) FROM t_user", queryBuilder.buildCount(build));
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setPageNumber(0);
+        userQuery.setPageSize(2);
+        userQuery.setSort("account,asc");
+        assertEquals("SELECT COUNT(*) FROM t_user", queryBuilder.buildCount(userQuery));
     }
 
     @Test

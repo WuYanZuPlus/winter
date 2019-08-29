@@ -42,7 +42,7 @@ public class QueryBuilder {
     private String build(Object query, String operation) {
         String selectSql = buildStartSql(query, operation);
         selectSql = buildWhereSql(selectSql, query);
-        if (query instanceof PageQuery) {
+        if (StringUtils.equals(operation, "SELECT *") && query instanceof PageQuery) {
             PageQuery pageQuery = (PageQuery) query;
             selectSql = buildSortSql(selectSql, pageQuery);
             selectSql = buildPageSql(selectSql, pageQuery);

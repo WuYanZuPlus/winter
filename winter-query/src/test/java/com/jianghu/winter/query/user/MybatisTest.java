@@ -60,7 +60,11 @@ public class MybatisTest {
 
     @Test
     public void test_count() {
-        assertEquals(4, userMapper.count(UserQuery.builder().build()));
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setPageNumber(0);
+        userQuery.setPageSize(2);
+        userQuery.setSort("account,asc");
+        assertEquals(4, userMapper.count(userQuery));
     }
 
 
