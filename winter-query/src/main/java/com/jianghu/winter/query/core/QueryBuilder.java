@@ -66,9 +66,13 @@ public class QueryBuilder {
                 continue;
             }
             String fieldName = field.getName();
-            QuerySuffixEnum conditionEnum = QuerySuffixEnum.resolve(fieldName);
-            String key = conditionEnum.name().toLowerCase() + Processor.class.getSimpleName();
-            suffixProcessorMap.get(key).process(whereList, query, fieldName, fieldValue);
+            QuerySuffixEnum suffixEnum = QuerySuffixEnum.resolve(fieldName);
+            String columnName = CommonUtil.camelCaseToUnderscore(suffixEnum.resolveColumnName(fieldName));
+            suffixProcessorMap.get(suffixEnum.name().toLowerCase() + Processor.class.getSimpleName())
+                    .process(whereList, columnName, fieldName, fieldValue);
+            if (suffixEnum == QuerySuffixEnum.Like) {
+                reWriteFieldValue(query, fieldName, fieldValue);
+            }
         }
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
@@ -99,5 +103,13 @@ public class QueryBuilder {
             log.error("Get the field value exception by reflection: {}", e.getMessage());
         }
         return null;
+    }
+
+    private void reWriteFieldValue(Object target, String fieldName, Object fieldValue) {
+        try {
+            FieldUtils.writeDeclaredField(target, fieldName, CommonUtil.reWriteLikeValue(fieldValue.toString()), true);
+        } catch (IllegalAccessException e) {
+            log.error("Override exception for field value suffixed with like: {}", e.getMessage());
+        }
     }
 }
