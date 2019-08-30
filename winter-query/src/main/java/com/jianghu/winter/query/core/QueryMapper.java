@@ -1,9 +1,6 @@
 package com.jianghu.winter.query.core;
 
-import org.apache.ibatis.annotations.Lang;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.SelectProvider;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -29,4 +26,7 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
 
     @SelectProvider(type = QueryBuilder.class, method = "buildDelete")
     void deleteByQuery(Q query);
+
+    @InsertProvider(type = CrudBuilder.class, method = "buildInsert")
+    void insert(E e);
 }

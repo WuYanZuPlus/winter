@@ -16,6 +16,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
+import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
@@ -120,4 +121,28 @@ public class MybatisTest {
         assertEquals(2, entities.size());
     }
 
+    @Test
+    public void test_insert() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setAccount("test");
+        userEntity.setEmail("123456@qq.com");
+        userEntity.setNickName("James");
+        userEntity.setMobile("18312341234");
+        userEntity.setPassword("123456");
+        userEntity.setValid(true);
+
+        userMapper.insert(userEntity);
+        UserEntity entity = userMapper.getByQuery(UserQuery.builder().account("test").build());
+        log.info("insert entity:\n{}", JSON.toJSONString(entity, true));
+        assertThat(entity)
+                .hasFieldOrPropertyWithValue("id",5)
+                .hasFieldOrPropertyWithValue("account","test")
+                .hasFieldOrPropertyWithValue("email","123456@qq.com")
+                .hasFieldOrPropertyWithValue("mobile","18312341234")
+                .hasFieldOrPropertyWithValue("nickName","James")
+                .hasFieldOrPropertyWithValue("password","123456")
+                .hasFieldOrPropertyWithValue("valid",true)
+
+        ;
+    }
 }
