@@ -8,13 +8,11 @@ import org.apache.ibatis.jdbc.ScriptRunner;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import java.io.Reader;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -31,18 +29,23 @@ public class MybatisTest {
     private static SqlSessionFactory sqlSessionFactory;
     private SqlSession sqlSession;
     private UserMapper userMapper;
+    private static Connection connection;
 
     @BeforeClass
     public static void init() throws Exception {
         Reader reader = Resources.getResourceAsReader("mybatis-config.xml");
         sqlSessionFactory = new SqlSessionFactoryBuilder().build(reader);
-        try (Connection connection = sqlSessionFactory.openSession().getConnection()) {
-            new ScriptRunner(connection).runScript(Resources.getResourceAsReader("import.sql"));
-        }
+        connection = sqlSessionFactory.openSession().getConnection();
+    }
+
+    @AfterClass
+    public static void closeConn() throws SQLException {
+        connection.close();
     }
 
     @Before
-    public void setUp() {
+    public void setUp() throws Exception {
+        new ScriptRunner(connection).runScript(Resources.getResourceAsReader("import.sql"));
         sqlSession = sqlSessionFactory.openSession();
         userMapper = sqlSession.getMapper(UserMapper.class);
     }
