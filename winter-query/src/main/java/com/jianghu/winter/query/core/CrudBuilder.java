@@ -2,14 +2,16 @@ package com.jianghu.winter.query.core;
 
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * @author daniel.hu
@@ -22,11 +24,18 @@ public class CrudBuilder extends QueryBuilder {
         if (table == null) {
             throw new IllegalStateException("@Table annotation unConfigured!");
         }
+        List<Field> allFields = FieldUtils.getAllFieldsList(entity.getClass());
+        List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
 
-        Field[] fields = entity.getClass().getDeclaredFields();
-        List<String> columnNames = Arrays.stream(fields).map(this::resolveColumnName).collect(Collectors.toList());
-        List<String> fieldValues = Arrays.stream(fields).map(field -> "#{" + field.getName() + "}").collect(Collectors.toCollection(ArrayList::new));
+        List<String> columnNames = filteredFields.stream().map(this::resolveColumnName).collect(Collectors.toList());
+        List<String> fieldValues = filteredFields.stream().map(field -> "#{" + field.getName() + "}").collect(Collectors.toList());
         return "INSERT INTO " + table.name() + "(" + StringUtils.join(columnNames, ", ") + ")" + " VALUES " + "(" + StringUtils.join(fieldValues, ", ") + ")";
+    }
+
+    private boolean isIgnoredField(Field field) {
+        return Modifier.isStatic(field.getModifiers())
+                || field.isAnnotationPresent(GeneratedValue.class)
+                || field.isAnnotationPresent(Transient.class);
     }
 
     private String resolveColumnName(Field field) {
