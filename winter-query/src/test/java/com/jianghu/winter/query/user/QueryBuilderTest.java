@@ -1,6 +1,7 @@
 package com.jianghu.winter.query.user;
 
 import com.jianghu.winter.query.core.QueryBuilder;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -63,6 +64,13 @@ public class QueryBuilderTest {
         UserQuery userQuery = UserQuery.builder().build();
         userQuery.setSort("user_name DESC");
         assertEquals("SELECT * FROM t_user ORDER BY user_name DESC", queryBuilder.buildSelect(userQuery));
+    }
+
+    @Test
+    public void custom_sort() {
+        UserQuery userQuery = UserQuery.builder().build();
+        userQuery.setSort("FIELD(user_name,'" + StringUtils.join(Arrays.asList("daniel", "user1"), "','") + "')");
+        assertEquals("SELECT * FROM t_user ORDER BY FIELD(user_name,'daniel','user1')", queryBuilder.buildSelect(userQuery));
     }
 
     @Test
