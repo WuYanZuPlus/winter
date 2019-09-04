@@ -26,6 +26,6 @@ public interface DataService<E, I, Q> {
 
     void delete(@Param("id") I id);
 
-    void deleteByQuery(Q query);
+    int deleteByQuery(Q query);
 
 }

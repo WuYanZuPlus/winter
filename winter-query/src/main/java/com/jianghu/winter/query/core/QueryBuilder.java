@@ -70,7 +70,7 @@ public class QueryBuilder {
         return startSql + " FROM " + queryTable.table();
     }
 
-    private String buildWhereSql(String selectSql, Object query) {
+    protected String buildWhereSql(String selectSql, Object query) {
         List<String> whereList = new LinkedList<>();
         for (Field field : query.getClass().getDeclaredFields()) {
             Object fieldValue = readFieldValue(query, field);

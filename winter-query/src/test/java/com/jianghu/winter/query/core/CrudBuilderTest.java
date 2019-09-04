@@ -1,6 +1,7 @@
 package com.jianghu.winter.query.core;
 
 import com.jianghu.winter.query.user.UserEntity;
+import com.jianghu.winter.query.user.UserQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -95,5 +96,14 @@ public class CrudBuilderTest {
         userEntity.setPassword("123456");
         userEntity.setValid(true);
         assertEquals("UPDATE t_user SET account = #{account}, password = #{password}, email = #{email}, nick_name = #{nickName}, valid = #{valid} WHERE id = #{id}", crudBuilder.buildPatch(userEntity));
+    }
+
+
+    @Test
+    public void test_patchByQuery() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setValid(false);
+
+        assertEquals("UPDATE t_user SET valid = #{valid} WHERE account = #{account}", crudBuilder.buildPatchByQuery(userEntity, UserQuery.builder().account("daniel").build()));
     }
 }

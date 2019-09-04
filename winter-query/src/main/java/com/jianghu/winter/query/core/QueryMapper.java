@@ -21,24 +21,24 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
     E get(@Param("id") I id);
 
     @Lang(MapperTableDriver.class)
-    @Select("DELETE FROM @{table} WHERE id = #{id}")
+    @Delete("DELETE FROM @{table} WHERE id = #{id}")
     void delete(@Param("id") I id);
 
-    @SelectProvider(type = QueryBuilder.class, method = "buildDelete")
-    void deleteByQuery(Q query);
+    @DeleteProvider(type = QueryBuilder.class, method = "buildDelete")
+    int deleteByQuery(Q query);
 
     @InsertProvider(type = CrudBuilder.class, method = "buildInsert")
     void insert(E e);
 
     @InsertProvider(type = CrudBuilder.class, method = "buildBatchInsert")
-    void batchInsert(@Param("list") Iterable<E> entities);
+    int batchInsert(@Param("list") Iterable<E> entities);
 
     /**
      * update all fields, null value will be considered.
      *
      * @param e entity
      */
-    @InsertProvider(type = CrudBuilder.class, method = "buildUpdate")
+    @UpdateProvider(type = CrudBuilder.class, method = "buildUpdate")
     void update(E e);
 
     /**
@@ -46,6 +46,9 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
      *
      * @param e entity
      */
-    @InsertProvider(type = CrudBuilder.class, method = "buildPatch")
+    @UpdateProvider(type = CrudBuilder.class, method = "buildPatch")
     void patch(E e);
+
+    @UpdateProvider(type = CrudBuilder.class, method = "buildPatchByQuery")
+    int patchByQuery(E e, Q query);
 }

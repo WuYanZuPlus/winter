@@ -20,7 +20,7 @@ import javax.persistence.Transient;
  */
 @Slf4j
 public class CrudBuilder extends QueryBuilder {
-    private static final String LOG_SQL = "SQL: {}";
+    private static final String LOG_SQL = "\nSQL: {}";
     private final Map<Class, String> insertSqlMap = new HashMap<>();
 
     /**
@@ -97,26 +97,36 @@ public class CrudBuilder extends QueryBuilder {
      * update
      */
     public String buildUpdate(Object entity) {
-        return update(entity, Operation.UPDATE);
+        String updateSql = buildUpdateSql(entity, Operation.UPDATE) + " WHERE id = #{id}";
+        log.debug(LOG_SQL, updateSql);
+        return updateSql;
     }
 
     /**
      * patch
      */
     public String buildPatch(Object entity) {
-        return update(entity, Operation.PATCH);
+        String updateSql = buildUpdateSql(entity, Operation.PATCH) + " WHERE id = #{id}";
+        log.debug(LOG_SQL, updateSql);
+        return updateSql;
     }
 
-    public String update(Object entity, Operation operation) {
+    /**
+     * patch by query
+     */
+    public String buildPatchByQuery(Object entity, Object query) {
+        String updateSql = buildUpdateSql(entity, Operation.PATCH) + super.buildWhereSql("", query);
+        log.debug(LOG_SQL, updateSql);
+        return updateSql;
+    }
+
+    public String buildUpdateSql(Object entity, Operation operation) {
         ArrayList<String> updateList = new ArrayList<>();
         updateList.add("UPDATE");
         updateList.add(resolveTableName(entity.getClass()));
         updateList.add("SET");
         updateList.add(buildUpdateOrPatchFields(entity, operation));
-        updateList.add("WHERE id = #{id}");
-        String updateSql = StringUtils.join(updateList, " ");
-        log.debug(LOG_SQL, updateSql);
-        return updateSql;
+        return StringUtils.join(updateList, " ");
     }
 
     private String buildUpdateOrPatchFields(Object entity, Operation operation) {

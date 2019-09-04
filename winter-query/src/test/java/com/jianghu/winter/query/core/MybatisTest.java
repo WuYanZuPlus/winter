@@ -204,4 +204,16 @@ public class MybatisTest {
                 .hasFieldOrProperty("mobile").isNotNull()
                 .hasFieldOrPropertyWithValue("userName", "updateName");
     }
+
+    @Test
+    public void test_patchByQuery() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setValid(false);
+
+        UserQuery userQuery = UserQuery.builder().account("daniel").build();
+        userMapper.patchByQuery(userEntity, userQuery);
+        UserEntity afterUpdate = userMapper.getByQuery(userQuery);
+        assertThat(afterUpdate)
+                .hasFieldOrPropertyWithValue("valid", false);
+    }
 }
