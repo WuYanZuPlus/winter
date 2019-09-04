@@ -1,6 +1,6 @@
-package com.jianghu.winter.query.user;
+package com.jianghu.winter.query.core;
 
-import com.jianghu.winter.query.core.QueryBuilder;
+import com.jianghu.winter.query.user.UserQuery;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.Test;

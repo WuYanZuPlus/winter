@@ -1,7 +1,9 @@
-package com.jianghu.winter.query.user;
+package com.jianghu.winter.query.core;
 
 import com.alibaba.fastjson.JSON;
-import com.jianghu.winter.query.core.PageList;
+import com.jianghu.winter.query.user.UserEntity;
+import com.jianghu.winter.query.user.UserMapper;
+import com.jianghu.winter.query.user.UserQuery;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -13,6 +15,7 @@ import org.junit.*;
 import java.io.Reader;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -135,14 +138,44 @@ public class MybatisTest {
         UserEntity entity = userMapper.getByQuery(UserQuery.builder().account("test").build());
         log.info("insert entity:\n{}", JSON.toJSONString(entity, true));
         assertThat(entity)
-                .hasFieldOrPropertyWithValue("id",5)
-                .hasFieldOrPropertyWithValue("account","test")
-                .hasFieldOrPropertyWithValue("email","123456@qq.com")
-                .hasFieldOrPropertyWithValue("mobile","18312341234")
-                .hasFieldOrPropertyWithValue("nickName","James")
-                .hasFieldOrPropertyWithValue("password","123456")
-                .hasFieldOrPropertyWithValue("valid",true)
+                .hasFieldOrPropertyWithValue("id", 5)
+                .hasFieldOrPropertyWithValue("account", "test")
+                .hasFieldOrPropertyWithValue("email", "123456@qq.com")
+                .hasFieldOrPropertyWithValue("mobile", "18312341234")
+                .hasFieldOrPropertyWithValue("nickName", "James")
+                .hasFieldOrPropertyWithValue("password", "123456")
+                .hasFieldOrPropertyWithValue("valid", true)
 
         ;
+    }
+
+    @Test
+    public void test_batchInsert() {
+        List<UserEntity> list = new ArrayList<>();
+
+        UserEntity user1 = new UserEntity();
+        user1.setAccount("test1");
+        user1.setEmail("123456@qq.com");
+        user1.setMobile("18312341234");
+        user1.setNickName("James");
+        user1.setPassword("123456");
+        user1.setValid(true);
+        list.add(user1);
+
+        UserEntity user2 = new UserEntity();
+        user2.setAccount("test2");
+        user2.setEmail("123456@qq.com");
+        user2.setMobile("18312341234");
+        user2.setNickName("James");
+        user2.setPassword("123456");
+        user2.setValid(true);
+        list.add(user2);
+
+        long count = userMapper.count(UserQuery.builder().build());
+        userMapper.batchInsert(list);
+        List<UserEntity> entities = userMapper.query(UserQuery.builder().build());
+        log.info("insert statement:\n{}", JSON.toJSONString(entities, true));
+        assertEquals(count + 2, userMapper.count(UserQuery.builder().build()));
+
     }
 }

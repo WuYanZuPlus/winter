@@ -29,4 +29,7 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
 
     @InsertProvider(type = CrudBuilder.class, method = "buildInsert")
     void insert(E e);
+
+    @InsertProvider(type = CrudBuilder.class, method = "buildBatchInsert")
+    void batchInsert(@Param("list") Iterable<E> entities);
 }
