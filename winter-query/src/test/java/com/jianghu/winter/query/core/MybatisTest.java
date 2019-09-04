@@ -178,4 +178,30 @@ public class MybatisTest {
         assertEquals(count + 2, userMapper.count(UserQuery.builder().build()));
 
     }
+
+    @Test
+    public void test_update() {
+        UserEntity userEntity = userMapper.get(1);
+        userEntity.setMobile(null);
+        userEntity.setUserName("updateName");
+        userMapper.update(userEntity);
+        UserEntity afterUpdate = userMapper.get(1);
+        log.info("afterUpdate:\n{}", JSON.toJSONString(afterUpdate, true));
+        assertThat(afterUpdate)
+                .hasFieldOrPropertyWithValue("mobile", null)
+                .hasFieldOrPropertyWithValue("userName", "updateName");
+    }
+
+    @Test
+    public void test_patch() {
+        UserEntity userEntity = userMapper.get(1);
+        userEntity.setMobile(null);
+        userEntity.setUserName("updateName");
+        userMapper.patch(userEntity);
+        UserEntity afterUpdate = userMapper.get(1);
+        log.info("afterUpdate:\n{}", JSON.toJSONString(afterUpdate, true));
+        assertThat(afterUpdate)
+                .hasFieldOrProperty("mobile").isNotNull()
+                .hasFieldOrPropertyWithValue("userName", "updateName");
+    }
 }

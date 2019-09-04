@@ -27,22 +27,21 @@ public class QueryBuilder {
     }
 
     public String buildSelect(Object query) {
-        return build(query, "SELECT *");
+        return build(query, Operation.SELECT);
     }
 
     public String buildCount(Object query) {
-        return build(query, "SELECT COUNT(*)");
+        return build(query, Operation.COUNT);
     }
 
     public String buildDelete(Object query) {
-        String deleteSql = buildStartSql(query, "DELETE");
-        return buildWhereSql(deleteSql, query);
+        return build(query, Operation.DELETE);
     }
 
-    private String build(Object query, String operation) {
+    private String build(Object query, Operation operation) {
         String selectSql = buildStartSql(query, operation);
         selectSql = buildWhereSql(selectSql, query);
-        if (StringUtils.equals(operation, "SELECT *") && query instanceof PageQuery) {
+        if (operation == Operation.SELECT && query instanceof PageQuery) {
             PageQuery pageQuery = (PageQuery) query;
             selectSql = buildSortSql(selectSql, pageQuery);
             selectSql = buildPageSql(selectSql, pageQuery);
@@ -50,12 +49,25 @@ public class QueryBuilder {
         return selectSql;
     }
 
-    private String buildStartSql(Object query, String operation) {
+    private String buildStartSql(Object query, Operation operation) {
         QueryTable queryTable = query.getClass().getAnnotation(QueryTable.class);
         if (queryTable == null) {
             throw new IllegalStateException("@QueryTable annotation unConfigured!");
         }
-        return operation + " FROM " + queryTable.table();
+        String startSql = "";
+        switch (operation){
+            case SELECT:
+                startSql = "SELECT *";
+                break;
+            case COUNT:
+                startSql = "SELECT COUNT(*)";
+                break;
+            case DELETE:
+                startSql = "DELETE";
+                break;
+            default:
+        }
+        return startSql + " FROM " + queryTable.table();
     }
 
     private String buildWhereSql(String selectSql, Object query) {
@@ -96,7 +108,7 @@ public class QueryBuilder {
         return selectSql;
     }
 
-    private Object readFieldValue(Object query, Field field) {
+    protected Object readFieldValue(Object query, Field field) {
         try {
             return FieldUtils.readField(field, query, true);
         } catch (IllegalAccessException e) {

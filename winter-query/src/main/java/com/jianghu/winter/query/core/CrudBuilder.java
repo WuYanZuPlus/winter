@@ -7,10 +7,7 @@ import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
@@ -26,12 +23,18 @@ public class CrudBuilder extends QueryBuilder {
     private static final String LOG_SQL = "SQL: {}";
     private final Map<Class, String> insertSqlMap = new HashMap<>();
 
+    /**
+     * insert
+     */
     public String buildInsert(Object entity) {
         String insertSql = insertSqlMap.computeIfAbsent(entity.getClass(), CrudBuilder::buildInsertSql);
         log.debug(LOG_SQL, insertSql);
         return insertSql;
     }
 
+    /**
+     * batch insert
+     */
     public String buildBatchInsert(Map map) {
         List<Object> entities = (List<Object>) map.get("list");
         Class<?> clazz0 = entities.get(0).getClass();
@@ -88,5 +91,50 @@ public class CrudBuilder extends QueryBuilder {
     private static String resolveColumnName(Field field) {
         Column column = field.getAnnotation(Column.class);
         return column != null && !column.name().isEmpty() ? column.name() : CommonUtil.camelCaseToUnderscore(field.getName());
+    }
+
+    /**
+     * update
+     */
+    public String buildUpdate(Object entity) {
+        return update(entity, Operation.UPDATE);
+    }
+
+    /**
+     * patch
+     */
+    public String buildPatch(Object entity) {
+        return update(entity, Operation.PATCH);
+    }
+
+    public String update(Object entity, Operation operation) {
+        ArrayList<String> updateList = new ArrayList<>();
+        updateList.add("UPDATE");
+        updateList.add(resolveTableName(entity.getClass()));
+        updateList.add("SET");
+        updateList.add(buildUpdateOrPatchFields(entity, operation));
+        updateList.add("WHERE id = #{id}");
+        String updateSql = StringUtils.join(updateList, " ");
+        log.debug(LOG_SQL, updateSql);
+        return updateSql;
+    }
+
+    private String buildUpdateOrPatchFields(Object entity, Operation operation) {
+        List<Field> allFields = FieldUtils.getAllFieldsList(entity.getClass());
+        List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
+        List<String> updateFields = new LinkedList<>();
+        if (operation == Operation.UPDATE) {
+            for (Field field : filteredFields) {
+                updateFields.add(resolveColumnName(field) + " = " + "#{" + field.getName() + "}");
+            }
+        } else {
+            for (Field field : filteredFields) {
+                Object value = readFieldValue(entity, field);
+                if (value != null) {
+                    updateFields.add(resolveColumnName(field) + " = " + "#{" + field.getName() + "}");
+                }
+            }
+        }
+        return StringUtils.join(updateFields, ", ");
     }
 }

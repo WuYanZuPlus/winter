@@ -32,4 +32,20 @@ public interface QueryMapper<E, I, Q> extends DataService<E, I, Q> {
 
     @InsertProvider(type = CrudBuilder.class, method = "buildBatchInsert")
     void batchInsert(@Param("list") Iterable<E> entities);
+
+    /**
+     * update all fields, null value will be considered.
+     *
+     * @param e entity
+     */
+    @InsertProvider(type = CrudBuilder.class, method = "buildUpdate")
+    void update(E e);
+
+    /**
+     * Update fields that are not null
+     *
+     * @param e entity
+     */
+    @InsertProvider(type = CrudBuilder.class, method = "buildPatch")
+    void patch(E e);
 }

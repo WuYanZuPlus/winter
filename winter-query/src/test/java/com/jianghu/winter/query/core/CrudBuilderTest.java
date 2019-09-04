@@ -2,6 +2,7 @@ package com.jianghu.winter.query.core;
 
 import com.jianghu.winter.query.user.UserEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -17,6 +18,14 @@ import static org.junit.Assert.assertEquals;
  */
 @Slf4j
 public class CrudBuilderTest {
+
+    private CrudBuilder crudBuilder;
+
+    @Before
+    public void setUp() throws Exception {
+        crudBuilder = new CrudBuilder();
+    }
+
     @Test
     public void insert() {
         UserEntity userEntity = new UserEntity();
@@ -26,7 +35,6 @@ public class CrudBuilderTest {
         userEntity.setNickName("James");
         userEntity.setPassword("123456");
         userEntity.setValid(true);
-        CrudBuilder crudBuilder = new CrudBuilder();
         String insertSql = crudBuilder.buildInsert(userEntity);
         log.info("insert statement:\n{}", insertSql);
         assertEquals("INSERT INTO t_user (account, user_name, password, mobile, email, nick_name, valid) VALUES (#{account}, #{userName}, #{password}, #{mobile}, #{email}, #{nickName}, #{valid})", insertSql);
@@ -63,5 +71,29 @@ public class CrudBuilderTest {
         assertEquals("INSERT INTO t_user (account, user_name, password, mobile, email, nick_name, valid) VALUES (#{list[0].account}, #{list[0].userName}, #{list[0].password}, #{list[0].mobile}, #{list[0].email}, #{list[0].nickName}, #{list[0].valid}), (#{list[1].account}, #{list[1].userName}, #{list[1].password}, #{list[1].mobile}, #{list[1].email}, #{list[1].nickName}, #{list[1].valid})", batchInsertSql);
     }
 
+    @Test
+    public void test_update() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setAccount("test");
+        userEntity.setEmail("123456@qq.com");
+        userEntity.setMobile(null);
+        userEntity.setNickName("James");
+        userEntity.setPassword("123456");
+        userEntity.setValid(true);
+        assertEquals("UPDATE t_user SET account = #{account}, user_name = #{userName}, password = #{password}, mobile = #{mobile}, email = #{email}, nick_name = #{nickName}, valid = #{valid} WHERE id = #{id}", crudBuilder.buildUpdate(userEntity));
+    }
 
+    @Test
+    public void test_patch() {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setId(1);
+        userEntity.setAccount("test");
+        userEntity.setEmail("123456@qq.com");
+        userEntity.setMobile(null);
+        userEntity.setNickName("James");
+        userEntity.setPassword("123456");
+        userEntity.setValid(true);
+        assertEquals("UPDATE t_user SET account = #{account}, password = #{password}, email = #{email}, nick_name = #{nickName}, valid = #{valid} WHERE id = #{id}", crudBuilder.buildPatch(userEntity));
+    }
 }
