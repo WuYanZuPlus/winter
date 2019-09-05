@@ -126,7 +126,7 @@ public class CrudBuilder extends QueryBuilder {
         return updateSql + whereSql;
     }
 
-    public String buildUpdateSql(Object entity, Operation operation) {
+    private String buildUpdateSql(Object entity, Operation operation) {
         ArrayList<String> updateList = new ArrayList<>();
         updateList.add("UPDATE");
         updateList.add(resolveTableName(entity.getClass()));

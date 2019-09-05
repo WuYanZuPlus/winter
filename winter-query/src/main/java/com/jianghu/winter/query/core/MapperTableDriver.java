@@ -16,7 +16,7 @@ public class MapperTableDriver extends XMLLanguageDriver {
     private MapperTable lastMapperTable;
 
     /**
-     * 替换SQL的@table@为{@link MapperTable}配置的表名
+     * 替换SQL的@table为{@link MapperTable}配置的表名
      * <p>
      * 用例场景
      * 1.继承IMapper的mapper表名替换
@@ -43,7 +43,7 @@ public class MapperTableDriver extends XMLLanguageDriver {
         if (mapperTable != null) {
             script = script.replaceAll("@\\{table}", mapperTable.value());
         } else {
-            throw new IllegalStateException("@MapperTable unconfigured!");
+            throw new IllegalStateException("@MapperTable unConfigured!");
         }
         return super.createSqlSource(configuration, script, parameterType);
     }

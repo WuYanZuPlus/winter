@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.jianghu.winter.query.user.UserEntity;
 import com.jianghu.winter.query.user.UserMapper;
 import com.jianghu.winter.query.user.UserQuery;
+import com.jianghu.winter.query.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -32,8 +33,8 @@ public class MybatisTest {
 
     private static SqlSessionFactory sqlSessionFactory;
     private SqlSession sqlSession;
-    private UserMapper userMapper;
     private static Connection connection;
+    private UserService userService;
 
     @BeforeClass
     public static void init() throws Exception {
@@ -51,7 +52,8 @@ public class MybatisTest {
     public void setUp() throws Exception {
         new ScriptRunner(connection).runScript(Resources.getResourceAsReader("import.sql"));
         sqlSession = sqlSessionFactory.openSession();
-        userMapper = sqlSession.getMapper(UserMapper.class);
+        UserMapper userMapper = sqlSession.getMapper(UserMapper.class);
+        userService = new UserService(userMapper);
     }
 
     @After
@@ -61,7 +63,7 @@ public class MybatisTest {
 
     @Test
     public void test_select() {
-        List<UserEntity> entities = userMapper.query(UserQuery.builder().build());
+        List<UserEntity> entities = userService.query(UserQuery.builder().build());
         log.info("query response:\n{}", JSON.toJSONString(entities, true));
         assertEquals(4, entities.size());
     }
@@ -72,7 +74,7 @@ public class MybatisTest {
         userQuery.setPageNumber(0);
         userQuery.setPageSize(2);
         userQuery.setSort("account,asc");
-        assertEquals(4, userMapper.count(userQuery));
+        assertEquals(4, userService.count(userQuery));
     }
 
 
@@ -81,7 +83,7 @@ public class MybatisTest {
         UserQuery query = UserQuery.builder().build();
         query.setPageNumber(0);
         query.setPageSize(2);
-        PageList<UserEntity> page = userMapper.page(query);
+        PageList<UserEntity> page = userService.page(query);
         log.info("page response:\n{}", JSON.toJSONString(page, true));
         assertEquals(4, page.total);
         assertEquals(2, page.getList().size());
@@ -89,38 +91,39 @@ public class MybatisTest {
 
     @Test
     public void test_where() {
-        List<UserEntity> entities = userMapper.query(UserQuery.builder().account("daniel").build());
+        List<UserEntity> entities = userService.query(UserQuery.builder().account("daniel").build());
         assertEquals(1, entities.size());
     }
 
     @Test
     public void test_getById() {
-        UserEntity userEntity = userMapper.get(1);
+        UserEntity userEntity = userService.get(1);
         log.info("entity:\n{}", JSON.toJSONString(userEntity, true));
         assertEquals("daniel", userEntity.getAccount());
     }
 
     @Test
     public void test_delete() {
-        userMapper.delete(1);
-        assertNull(userMapper.get(1));
+        userService.delete(1);
+        assertNull(userService.get(1));
     }
 
     @Test
     public void test_deleteByQuery() {
-        userMapper.deleteByQuery(UserQuery.builder().account("daniel").build());
-        assertNull(userMapper.get(1));
+        int deleteCount = userService.delete(UserQuery.builder().account("daniel").build());
+        assertEquals(1, deleteCount);
+        assertNull(userService.get(1));
     }
 
     @Test
     public void test_getByQuery() {
-        UserEntity entity = userMapper.getByQuery(UserQuery.builder().userNameLike("张").build());
+        UserEntity entity = userService.get(UserQuery.builder().userNameLike("张").build());
         assertEquals("user2", entity.getAccount());
     }
 
     @Test
     public void test_in() {
-        List<UserEntity> entities = userMapper.query(UserQuery.builder().idIn(Arrays.asList(1, 2)).build());
+        List<UserEntity> entities = userService.query(UserQuery.builder().idIn(Arrays.asList(1, 2)).build());
         assertEquals(2, entities.size());
     }
 
@@ -134,8 +137,8 @@ public class MybatisTest {
         userEntity.setPassword("123456");
         userEntity.setValid(true);
 
-        userMapper.insert(userEntity);
-        UserEntity entity = userMapper.getByQuery(UserQuery.builder().account("test").build());
+        userService.create(userEntity);
+        UserEntity entity = userService.get(UserQuery.builder().account("test").build());
         log.info("insert entity:\n{}", JSON.toJSONString(entity, true));
         assertThat(entity)
                 .hasFieldOrPropertyWithValue("id", 5)
@@ -172,22 +175,22 @@ public class MybatisTest {
         list.add(user2);
 
         UserQuery userQuery = UserQuery.builder().build();
-        long count = userMapper.count(userQuery);
-        int insertCount = userMapper.batchInsert(list);
+        long count = userService.count(userQuery);
+        int insertCount = userService.create(list);
         assertEquals(2, insertCount);
-        List<UserEntity> entities = userMapper.query(userQuery);
+        List<UserEntity> entities = userService.query(userQuery);
         log.info("insert statement:\n{}", JSON.toJSONString(entities, true));
-        assertEquals(count + 2, userMapper.count(userQuery));
+        assertEquals(count + 2, userService.count(userQuery));
 
     }
 
     @Test
     public void test_update() {
-        UserEntity userEntity = userMapper.get(1);
+        UserEntity userEntity = userService.get(1);
         userEntity.setMobile(null);
         userEntity.setUserName("updateName");
-        userMapper.update(userEntity);
-        UserEntity afterUpdate = userMapper.get(1);
+        userService.update(userEntity);
+        UserEntity afterUpdate = userService.get(1);
         log.info("afterUpdate:\n{}", JSON.toJSONString(afterUpdate, true));
         assertThat(afterUpdate)
                 .hasFieldOrPropertyWithValue("mobile", null)
@@ -196,11 +199,11 @@ public class MybatisTest {
 
     @Test
     public void test_patch() {
-        UserEntity userEntity = userMapper.get(1);
+        UserEntity userEntity = userService.get(1);
         userEntity.setMobile(null);
         userEntity.setUserName("updateName");
-        userMapper.patch(userEntity);
-        UserEntity afterUpdate = userMapper.get(1);
+        userService.patch(userEntity);
+        UserEntity afterUpdate = userService.get(1);
         log.info("afterUpdate:\n{}", JSON.toJSONString(afterUpdate, true));
         assertThat(afterUpdate)
                 .hasFieldOrProperty("mobile").isNotNull()
@@ -213,9 +216,9 @@ public class MybatisTest {
         userEntity.setValid(false);
 
         UserQuery userQuery = UserQuery.builder().account("daniel").build();
-        int updateCount = userMapper.patchByQuery(userEntity, userQuery);
+        int updateCount = userService.patch(userEntity, userQuery);
         assertEquals(1, updateCount);
-        UserEntity afterUpdate = userMapper.getByQuery(userQuery);
+        UserEntity afterUpdate = userService.get(userQuery);
         assertThat(afterUpdate)
                 .hasFieldOrPropertyWithValue("valid", false);
     }

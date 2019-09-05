@@ -20,6 +20,7 @@ public interface Processor {
      */
     void process(List<String> whereList, String columnName, String fieldName, Object fieldValue);
 
+
     class DefaultProcessor implements Processor {
         @Override
         public void process(List<String> whereList, String columnName, String fieldName, Object fieldValue) {
