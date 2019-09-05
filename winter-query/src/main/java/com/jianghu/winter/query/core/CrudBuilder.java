@@ -2,6 +2,7 @@ package com.jianghu.winter.query.core;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RegExUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
@@ -113,11 +114,16 @@ public class CrudBuilder extends QueryBuilder {
 
     /**
      * patch by query
+     * notice: When you have many parameters, use param1,param2 in order to avoid exceptions
      */
     public String buildPatchByQuery(Object entity, Object query) {
-        String updateSql = buildUpdateSql(entity, Operation.PATCH) + super.buildWhereSql("", query);
-        log.debug(LOG_SQL, updateSql);
-        return updateSql;
+        String updateSql = buildUpdateSql(entity, Operation.PATCH);
+        updateSql = RegExUtils.replaceAll(updateSql, "#\\{", "#{param1.");
+
+        String whereSql = super.buildWhereSql("", query);
+        whereSql = RegExUtils.replaceAll(whereSql, "#\\{", "#{param2.");
+        log.debug(LOG_SQL, updateSql + whereSql);
+        return updateSql + whereSql;
     }
 
     public String buildUpdateSql(Object entity, Operation operation) {

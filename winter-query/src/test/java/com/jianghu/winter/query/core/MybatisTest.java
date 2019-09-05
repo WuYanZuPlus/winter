@@ -171,11 +171,13 @@ public class MybatisTest {
         user2.setValid(true);
         list.add(user2);
 
-        long count = userMapper.count(UserQuery.builder().build());
-        userMapper.batchInsert(list);
-        List<UserEntity> entities = userMapper.query(UserQuery.builder().build());
+        UserQuery userQuery = UserQuery.builder().build();
+        long count = userMapper.count(userQuery);
+        int insertCount = userMapper.batchInsert(list);
+        assertEquals(2, insertCount);
+        List<UserEntity> entities = userMapper.query(userQuery);
         log.info("insert statement:\n{}", JSON.toJSONString(entities, true));
-        assertEquals(count + 2, userMapper.count(UserQuery.builder().build()));
+        assertEquals(count + 2, userMapper.count(userQuery));
 
     }
 
@@ -211,7 +213,8 @@ public class MybatisTest {
         userEntity.setValid(false);
 
         UserQuery userQuery = UserQuery.builder().account("daniel").build();
-        userMapper.patchByQuery(userEntity, userQuery);
+        int updateCount = userMapper.patchByQuery(userEntity, userQuery);
+        assertEquals(1, updateCount);
         UserEntity afterUpdate = userMapper.getByQuery(userQuery);
         assertThat(afterUpdate)
                 .hasFieldOrPropertyWithValue("valid", false);

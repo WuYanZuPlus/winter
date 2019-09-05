@@ -104,6 +104,6 @@ public class CrudBuilderTest {
         UserEntity userEntity = new UserEntity();
         userEntity.setValid(false);
 
-        assertEquals("UPDATE t_user SET valid = #{valid} WHERE account = #{account}", crudBuilder.buildPatchByQuery(userEntity, UserQuery.builder().account("daniel").build()));
+        assertEquals("UPDATE t_user SET valid = #{param1.valid} WHERE account = #{param2.account}", crudBuilder.buildPatchByQuery(userEntity, UserQuery.builder().account("daniel").build()));
     }
 }
