@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Slf4j
 public class QueryProvider {
-
+    protected static final String LOG_SQL = "\nSQL: {}";
     private static final Map<String, Processor> suffixProcessorMap = new ConcurrentHashMap<>();
 
     static {
@@ -42,6 +42,7 @@ public class QueryProvider {
             selectSql = buildSortSql(selectSql, pageQuery);
             selectSql = buildPageSql(selectSql, pageQuery);
         }
+        log.debug(LOG_SQL, selectSql);
         return selectSql;
     }
 

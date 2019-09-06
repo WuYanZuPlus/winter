@@ -21,7 +21,6 @@ import javax.persistence.Transient;
  */
 @Slf4j
 public class CrudProvider extends QueryProvider {
-    private static final String LOG_SQL = "\nSQL: {}";
     private final Map<Class, String> insertSqlMap = new HashMap<>();
 
     /**
@@ -35,7 +34,7 @@ public class CrudProvider extends QueryProvider {
      * insert
      */
     public String buildInsert(Object entity) {
-        String insertSql = insertSqlMap.computeIfAbsent(entity.getClass(), CrudProvider::buildInsertSql);
+        String insertSql = insertSqlMap.computeIfAbsent(entity.getClass(), CrudProvider::buildInsert);
         log.debug(LOG_SQL, insertSql);
         return insertSql;
     }
@@ -43,32 +42,19 @@ public class CrudProvider extends QueryProvider {
     /**
      * batch insert
      */
-    public String buildBatchInsert(Map map) {
+    public static String buildBatchInsert(Map map) {
         List<Object> entities = (List<Object>) map.get("list");
         Class<?> clazz0 = entities.get(0).getClass();
-        List<Field> allFields = FieldUtils.getAllFieldsList(clazz0);
-        List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
-        List<String> columnNames = filteredFields.stream().map(CrudProvider::resolveColumnName).collect(Collectors.toList());
-
-        List<String> batchFieldValues = new ArrayList<>();
-        List<String> fieldValues = new ArrayList<>();
-        for (int i = 0; i < entities.size(); i++) {
-            for (Field field : filteredFields) {
-                String format = String.format("#{list[%d].%s}", i, field.getName());
-                fieldValues.add(format);
-            }
-            batchFieldValues.add("(" + StringUtils.join(fieldValues, ", ") + ")");
-            fieldValues.clear();
-        }
+        List<Field> filteredFields = getFilteredFields(clazz0);
+        List<String> columnNames = getInsertColumnNames(filteredFields);
+        List<String> batchFieldValues = getBatchInsertFieldValues(filteredFields, entities.size());
         return buildInsertSql(resolveTableName(clazz0), columnNames, StringUtils.join(batchFieldValues, ", "));
     }
 
-    private static String buildInsertSql(Class<?> entityClass) {
-        List<Field> allFields = FieldUtils.getAllFieldsList(entityClass);
-        List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
-        List<String> columnNames = filteredFields.stream().map(CrudProvider::resolveColumnName).collect(Collectors.toList());
-
-        List<String> fieldValues = filteredFields.stream().map(field -> "#{" + field.getName() + "}").collect(Collectors.toList());
+    private static String buildInsert(Class<?> entityClass) {
+        List<Field> filteredFields = getFilteredFields(entityClass);
+        List<String> columnNames = getInsertColumnNames(filteredFields);
+        List<String> fieldValues = getInsertFieldValues(filteredFields);
         return buildInsertSql(resolveTableName(entityClass), columnNames, "(" + StringUtils.join(fieldValues, ", ") + ")");
     }
 
@@ -80,25 +66,6 @@ public class CrudProvider extends QueryProvider {
         insertList.add("VALUES");
         insertList.add(fieldValues);
         return StringUtils.join(insertList, " ");
-    }
-
-    private static String resolveTableName(Class<?> clazz) {
-        Table table = clazz.getDeclaredAnnotation(Table.class);
-        if (table == null) {
-            throw new IllegalStateException("@Table annotation unConfigured!");
-        }
-        return table.name();
-    }
-
-    private static boolean isIgnoredField(Field field) {
-        return Modifier.isStatic(field.getModifiers())
-                || field.isAnnotationPresent(GeneratedValue.class)
-                || field.isAnnotationPresent(Transient.class);
-    }
-
-    private static String resolveColumnName(Field field) {
-        Column column = field.getAnnotation(Column.class);
-        return column != null && !column.name().isEmpty() ? column.name() : CommonUtil.camelCaseToUnderscore(field.getName());
     }
 
     /**
@@ -143,21 +110,70 @@ public class CrudProvider extends QueryProvider {
     }
 
     private String buildUpdateOrPatchFields(Object entity, Operation operation) {
-        List<Field> allFields = FieldUtils.getAllFieldsList(entity.getClass());
-        List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
+        List<Field> filteredFields = getFilteredFields(entity.getClass());
         List<String> updateFields = new LinkedList<>();
-        if (operation == Operation.UPDATE) {
-            for (Field field : filteredFields) {
-                updateFields.add(resolveColumnName(field) + " = " + "#{" + field.getName() + "}");
-            }
-        } else {
-            for (Field field : filteredFields) {
-                Object value = readFieldValue(entity, field);
-                if (value != null) {
+        switch (operation) {
+            case UPDATE:
+                for (Field field : filteredFields) {
                     updateFields.add(resolveColumnName(field) + " = " + "#{" + field.getName() + "}");
                 }
-            }
+                break;
+            case PATCH:
+                for (Field field : filteredFields) {
+                    Object value = readFieldValue(entity, field);
+                    if (value != null) {
+                        updateFields.add(resolveColumnName(field) + " = " + "#{" + field.getName() + "}");
+                    }
+                }
+                break;
+            default:
         }
         return StringUtils.join(updateFields, ", ");
+    }
+
+    private static List<Field> getFilteredFields(Class<?> entityClass) {
+        List<Field> allFields = FieldUtils.getAllFieldsList(entityClass);
+        return allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
+    }
+
+    private static List<String> getInsertColumnNames(List<Field> filteredFields) {
+        return filteredFields.stream().map(CrudProvider::resolveColumnName).collect(Collectors.toList());
+    }
+
+    private static List<String> getInsertFieldValues(List<Field> filteredFields) {
+        return filteredFields.stream().map(field -> "#{" + field.getName() + "}").collect(Collectors.toList());
+    }
+
+    private static List<String> getBatchInsertFieldValues(List<Field> filteredFields, int size) {
+        List<String> batchFieldValues = new ArrayList<>();
+        List<String> fieldValues = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            for (Field field : filteredFields) {
+                String format = String.format("#{list[%d].%s}", i, field.getName());
+                fieldValues.add(format);
+            }
+            batchFieldValues.add("(" + StringUtils.join(fieldValues, ", ") + ")");
+            fieldValues.clear();
+        }
+        return batchFieldValues;
+    }
+
+    private static boolean isIgnoredField(Field field) {
+        return Modifier.isStatic(field.getModifiers())
+                || field.isAnnotationPresent(GeneratedValue.class)
+                || field.isAnnotationPresent(Transient.class);
+    }
+
+    private static String resolveTableName(Class<?> clazz) {
+        Table table = clazz.getDeclaredAnnotation(Table.class);
+        if (table == null) {
+            throw new IllegalStateException("@Table annotation unConfigured!");
+        }
+        return table.name();
+    }
+
+    private static String resolveColumnName(Field field) {
+        Column column = field.getAnnotation(Column.class);
+        return column != null && !column.name().isEmpty() ? column.name() : CommonUtil.camelCaseToUnderscore(field.getName());
     }
 }
