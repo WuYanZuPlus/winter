@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
+ * @param <E> - entity (like UserEntity)
+ * @param <I> - the type of the identifier (like Long or Integer)
+ * @param <Q> - query (like UserQuery)
  * @author daniel.hu
  * @date 2019/8/27 16:24
  */
-public interface MybatisDataService<E, I extends Serializable, Q extends PageQuery> {
+public interface MybatisDataService<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> {
 
     E get(I id);
 

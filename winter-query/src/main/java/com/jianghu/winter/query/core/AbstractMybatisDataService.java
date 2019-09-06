@@ -7,7 +7,7 @@ import java.util.List;
  * @author daniel.hu
  * @date 2019/9/5 13:52
  */
-public abstract class AbstractMybatisDataService<E, I extends Serializable, Q extends PageQuery> implements MybatisDataService<E, I, Q> {
+public abstract class AbstractMybatisDataService<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> implements MybatisDataService<E, I, Q> {
 
     protected abstract QueryMapper<E, I, Q> getMapper();
 

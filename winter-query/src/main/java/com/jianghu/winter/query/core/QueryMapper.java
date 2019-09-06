@@ -2,20 +2,20 @@ package com.jianghu.winter.query.core;
 
 import org.apache.ibatis.annotations.*;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * general interface
  * All interfaces using @Mapper annotations must extends this
- * 泛型注释:
- * E - entity (like UserEntity)
- * I - id (Long or Integer)
- * Q - query (like UserQuery)
  *
+ * @param <E> - entity (like UserEntity)
+ * @param <I> - the type of the identifier (Long or Integer)
+ * @param <Q> - query (like UserQuery)
  * @author daniel.hu
  * @date 2019/8/27 10:26
  */
-public interface QueryMapper<E, I, Q> {
+public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> {
 
     @SelectProvider(type = QueryBuilder.class, method = "buildSelect")
     List<E> query(Q query);
