@@ -20,15 +20,22 @@ import javax.persistence.Transient;
  * @date 2019/8/30 15:22
  */
 @Slf4j
-public class CrudBuilder extends QueryBuilder {
+public class CrudProvider extends QueryProvider {
     private static final String LOG_SQL = "\nSQL: {}";
     private final Map<Class, String> insertSqlMap = new HashMap<>();
+
+    /**
+     * delete
+     */
+    public String buildDelete(Object query) {
+        return super.build(query, Operation.DELETE);
+    }
 
     /**
      * insert
      */
     public String buildInsert(Object entity) {
-        String insertSql = insertSqlMap.computeIfAbsent(entity.getClass(), CrudBuilder::buildInsertSql);
+        String insertSql = insertSqlMap.computeIfAbsent(entity.getClass(), CrudProvider::buildInsertSql);
         log.debug(LOG_SQL, insertSql);
         return insertSql;
     }
@@ -41,7 +48,7 @@ public class CrudBuilder extends QueryBuilder {
         Class<?> clazz0 = entities.get(0).getClass();
         List<Field> allFields = FieldUtils.getAllFieldsList(clazz0);
         List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
-        List<String> columnNames = filteredFields.stream().map(CrudBuilder::resolveColumnName).collect(Collectors.toList());
+        List<String> columnNames = filteredFields.stream().map(CrudProvider::resolveColumnName).collect(Collectors.toList());
 
         List<String> batchFieldValues = new ArrayList<>();
         List<String> fieldValues = new ArrayList<>();
@@ -59,7 +66,7 @@ public class CrudBuilder extends QueryBuilder {
     private static String buildInsertSql(Class<?> entityClass) {
         List<Field> allFields = FieldUtils.getAllFieldsList(entityClass);
         List<Field> filteredFields = allFields.stream().filter(field -> !isIgnoredField(field)).collect(Collectors.toList());
-        List<String> columnNames = filteredFields.stream().map(CrudBuilder::resolveColumnName).collect(Collectors.toList());
+        List<String> columnNames = filteredFields.stream().map(CrudProvider::resolveColumnName).collect(Collectors.toList());
 
         List<String> fieldValues = filteredFields.stream().map(field -> "#{" + field.getName() + "}").collect(Collectors.toList());
         return buildInsertSql(resolveTableName(entityClass), columnNames, "(" + StringUtils.join(fieldValues, ", ") + ")");
@@ -114,7 +121,7 @@ public class CrudBuilder extends QueryBuilder {
 
     /**
      * patch by query
-     * notice: When you have many parameters, use param1,param2 in order to avoid exceptions
+     * notice: When you have many parameters, use param1,param2... in order to avoid exceptions
      */
     public String buildPatchByQuery(Object entity, Object query) {
         String updateSql = buildUpdateSql(entity, Operation.PATCH);

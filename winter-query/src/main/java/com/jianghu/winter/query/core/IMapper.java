@@ -15,12 +15,12 @@ import java.util.List;
  * @author daniel.hu
  * @date 2019/8/27 10:26
  */
-public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> {
+public interface IMapper<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> {
 
-    @SelectProvider(type = QueryBuilder.class, method = "buildSelect")
+    @SelectProvider(type = QueryProvider.class, method = "buildSelect")
     List<E> query(Q query);
 
-    @SelectProvider(type = QueryBuilder.class, method = "buildCount")
+    @SelectProvider(type = QueryProvider.class, method = "buildCount")
     long count(Q query);
 
     @Lang(MapperTableDriver.class)
@@ -37,10 +37,10 @@ public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q
      * @param query query
      * @return delete count
      */
-    @DeleteProvider(type = QueryBuilder.class, method = "buildDelete")
+    @DeleteProvider(type = CrudProvider.class, method = "buildDelete")
     int deleteByQuery(Q query);
 
-    @InsertProvider(type = CrudBuilder.class, method = "buildInsert")
+    @InsertProvider(type = CrudProvider.class, method = "buildInsert")
     void insert(E e);
 
     /**
@@ -49,7 +49,7 @@ public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q
      * @param entities entity 集合
      * @return batch insert count
      */
-    @InsertProvider(type = CrudBuilder.class, method = "buildBatchInsert")
+    @InsertProvider(type = CrudProvider.class, method = "buildBatchInsert")
     int batchInsert(@Param("list") Iterable<E> entities);
 
     /**
@@ -57,7 +57,7 @@ public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q
      *
      * @param e entity
      */
-    @UpdateProvider(type = CrudBuilder.class, method = "buildUpdate")
+    @UpdateProvider(type = CrudProvider.class, method = "buildUpdate")
     void update(E e);
 
     /**
@@ -65,7 +65,7 @@ public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q
      *
      * @param e entity
      */
-    @UpdateProvider(type = CrudBuilder.class, method = "buildPatch")
+    @UpdateProvider(type = CrudProvider.class, method = "buildPatch")
     void patch(E e);
 
     /**
@@ -75,6 +75,6 @@ public interface QueryMapper<E extends Persistable<I>, I extends Serializable, Q
      * @param query query
      * @return update count
      */
-    @UpdateProvider(type = CrudBuilder.class, method = "buildPatchByQuery")
+    @UpdateProvider(type = CrudProvider.class, method = "buildPatchByQuery")
     int patchByQuery(E e, Q query);
 }

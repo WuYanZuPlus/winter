@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @date 2019/8/22 10:47
  */
 @Slf4j
-public class QueryBuilder {
+public class QueryProvider {
 
     private static final Map<String, Processor> suffixProcessorMap = new ConcurrentHashMap<>();
 
@@ -34,11 +34,7 @@ public class QueryBuilder {
         return build(query, Operation.COUNT);
     }
 
-    public String buildDelete(Object query) {
-        return build(query, Operation.DELETE);
-    }
-
-    private String build(Object query, Operation operation) {
+    protected String build(Object query, Operation operation) {
         String selectSql = buildStartSql(query, operation);
         selectSql = buildWhereSql(selectSql, query);
         if (operation == Operation.SELECT && query instanceof PageQuery) {
@@ -83,7 +79,7 @@ public class QueryBuilder {
             suffixProcessorMap.get(suffixEnum.name().toLowerCase() + Processor.class.getSimpleName())
                     .process(whereList, columnName, fieldName, fieldValue);
             if (suffixEnum == QuerySuffixEnum.Like) {
-                reWriteFieldValue(query, fieldName, fieldValue);
+                reWriteFieldValue(query, fieldName, CommonUtil.reWriteLikeValue(fieldValue.toString()));
             }
         }
         if (!whereList.isEmpty()) {
@@ -119,7 +115,7 @@ public class QueryBuilder {
 
     private void reWriteFieldValue(Object target, String fieldName, Object fieldValue) {
         try {
-            FieldUtils.writeDeclaredField(target, fieldName, CommonUtil.reWriteLikeValue(fieldValue.toString()), true);
+            FieldUtils.writeDeclaredField(target, fieldName, fieldValue, true);
         } catch (IllegalAccessException e) {
             log.error("Override exception for field value suffixed with like: {}", e.getMessage());
         }

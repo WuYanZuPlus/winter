@@ -9,7 +9,7 @@ import java.util.List;
  */
 public abstract class AbstractMybatisDataService<E extends Persistable<I>, I extends Serializable, Q extends PageQuery> implements MybatisDataService<E, I, Q> {
 
-    protected abstract QueryMapper<E, I, Q> getMapper();
+    protected abstract IMapper<E, I, Q> getMapper();
 
     @Override
     public E get(I id) {
