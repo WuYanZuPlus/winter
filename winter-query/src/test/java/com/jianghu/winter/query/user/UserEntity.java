@@ -28,4 +28,5 @@ public class UserEntity implements IdSupport<Integer> {
     @Column(name = "nick_name")
     private String nickName;
     private boolean valid;
+    private UserType userType;
 }

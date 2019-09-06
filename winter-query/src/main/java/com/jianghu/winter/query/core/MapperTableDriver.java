@@ -43,7 +43,7 @@ public class MapperTableDriver extends XMLLanguageDriver {
         if (mapperTable != null) {
             script = script.replaceAll("@\\{table}", mapperTable.value());
         } else {
-            throw new IllegalStateException("@MapperTable unConfigured!");
+            throw new IllegalStateException("@MapperTable annotation unConfigured!");
         }
         return super.createSqlSource(configuration, script, parameterType);
     }

@@ -1,10 +1,7 @@
 package com.jianghu.winter.query.core;
 
 import com.alibaba.fastjson.JSON;
-import com.jianghu.winter.query.user.UserEntity;
-import com.jianghu.winter.query.user.UserMapper;
-import com.jianghu.winter.query.user.UserQuery;
-import com.jianghu.winter.query.user.UserService;
+import com.jianghu.winter.query.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
@@ -136,6 +133,7 @@ public class MybatisTest {
         userEntity.setMobile("18312341234");
         userEntity.setPassword("123456");
         userEntity.setValid(true);
+        userEntity.setUserType(UserType.SYSTEM);
 
         userService.create(userEntity);
         UserEntity entity = userService.get(UserQuery.builder().account("test").build());
@@ -189,11 +187,13 @@ public class MybatisTest {
         UserEntity userEntity = userService.get(1);
         userEntity.setMobile(null);
         userEntity.setUserName("updateName");
+        userEntity.setUserType(UserType.TENANT);
         userService.update(userEntity);
         UserEntity afterUpdate = userService.get(1);
         log.info("afterUpdate:\n{}", JSON.toJSONString(afterUpdate, true));
         assertThat(afterUpdate)
                 .hasFieldOrPropertyWithValue("mobile", null)
+                .hasFieldOrPropertyWithValue("userType", UserType.TENANT)
                 .hasFieldOrPropertyWithValue("userName", "updateName");
     }
 
@@ -221,5 +221,13 @@ public class MybatisTest {
         UserEntity afterUpdate = userService.get(userQuery);
         assertThat(afterUpdate)
                 .hasFieldOrPropertyWithValue("valid", false);
+    }
+
+    @Test
+    public void test_enum() {
+        UserQuery userQuery = UserQuery.builder().userType(UserType.SYSTEM).build();
+        List<UserEntity> entities = userService.query(userQuery);
+        log.info("query:\n{}", JSON.toJSONString(entities, true));
+        assertEquals(3, entities.size());
     }
 }

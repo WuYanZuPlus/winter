@@ -21,4 +21,5 @@ public class UserQuery extends PageQuery {
     private String userName;
     private String userNameLike;
     private Collection<Integer> idIn;
+    private UserType userType;
 }

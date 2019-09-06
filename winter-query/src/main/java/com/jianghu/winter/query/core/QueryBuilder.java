@@ -55,7 +55,7 @@ public class QueryBuilder {
             throw new IllegalStateException("@QueryTable annotation unConfigured!");
         }
         String startSql = "";
-        switch (operation){
+        switch (operation) {
             case SELECT:
                 startSql = "SELECT *";
                 break;
