@@ -94,6 +94,11 @@ public class QueryProviderTest {
         assertEquals("SELECT * FROM t_user", queryProvider.buildSelect(userQuery));
     }
 
+    @Test
+    public void and() {
+        UserQuery userQuery = UserQuery.builder().userNameOrNickName("test").build();
+        assertEquals("SELECT * FROM t_user WHERE (user_name = #{userNameOrNickName} OR nick_name = #{userNameOrNickName})", queryProvider.buildSelect(userQuery));
+    }
 
 
 }

@@ -230,4 +230,13 @@ public class MybatisTest {
         log.info("query:\n{}", JSON.toJSONString(entities, true));
         assertEquals(3, entities.size());
     }
+
+
+    @Test
+    public void test_and() {
+        UserQuery userQuery = UserQuery.builder().userNameOrNickName("别名1").build();
+        List<UserEntity> entities = userService.query(userQuery);
+        log.info("query:\n{}", JSON.toJSONString(entities, true));
+        assertEquals(1, entities.size());
+    }
 }

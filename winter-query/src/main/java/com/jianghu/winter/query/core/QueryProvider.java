@@ -1,11 +1,13 @@
 package com.jianghu.winter.query.core;
 
+import com.jianghu.winter.query.annotation.QueryField;
 import com.jianghu.winter.query.annotation.QueryTable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -69,10 +71,17 @@ public class QueryProvider {
 
     protected String buildWhereSql(String selectSql, Object query) {
         List<String> whereList = new LinkedList<>();
-        for (Field field : query.getClass().getDeclaredFields()) {
+        Arrays.stream(query.getClass().getDeclaredFields()).forEach(field -> {
             Object fieldValue = readFieldValue(query, field);
             if (fieldValue == null) {
-                continue;
+                return;
+            }
+            if (field.isAnnotationPresent(QueryField.class)) {
+                String andSql = field.getAnnotation(QueryField.class).and();
+                if (StringUtils.isNotBlank(andSql)) {
+                    whereList.add(andSql);
+                }
+                return;
             }
             String fieldName = field.getName();
             QuerySuffixEnum suffixEnum = QuerySuffixEnum.resolve(fieldName);
@@ -82,7 +91,7 @@ public class QueryProvider {
             if (suffixEnum == QuerySuffixEnum.Like) {
                 reWriteFieldValue(query, fieldName, CommonUtil.reWriteLikeValue(fieldValue.toString()));
             }
-        }
+        });
         if (!whereList.isEmpty()) {
             String whereSql = " WHERE " + StringUtils.join(whereList, " AND ");
             selectSql += whereSql;

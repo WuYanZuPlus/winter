@@ -1,5 +1,6 @@
 package com.jianghu.winter.query.user;
 
+import com.jianghu.winter.query.annotation.QueryField;
 import com.jianghu.winter.query.annotation.QueryTable;
 import com.jianghu.winter.query.core.PageQuery;
 import lombok.Builder;
@@ -22,4 +23,6 @@ public class UserQuery extends PageQuery {
     private String userNameLike;
     private Collection<Integer> idIn;
     private UserType userType;
+    @QueryField(and = "(user_name = #{userNameOrNickName} OR nick_name = #{userNameOrNickName})")
+    private String userNameOrNickName;
 }
