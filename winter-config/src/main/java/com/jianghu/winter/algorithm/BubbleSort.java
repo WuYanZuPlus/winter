@@ -3,10 +3,12 @@ package com.jianghu.winter.algorithm;
 import com.alibaba.fastjson.JSON;
 
 /**
+ * 冒泡排序
+ *
  * @Author: daniel.hu
  * @Date: 2021/7/13 19:06
  */
-public class 冒泡 {
+public class BubbleSort {
 
     public static int[] sort(int[] input) {
         int l = input.length;
@@ -17,8 +19,8 @@ public class 冒泡 {
             for (int j = 0; j < l - i - 1; j++) {
                 if (input[j] > input[j + 1]) {
                     int temp = input[j];
-                    input[j] = input[j+1];
-                    input[j+1] = temp;
+                    input[j] = input[j + 1];
+                    input[j + 1] = temp;
                 }
             }
         }
