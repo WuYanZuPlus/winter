@@ -8,7 +8,7 @@ package com.jianghu.winter.algorithm;
  * 插入一个字符
  * 删除一个字符
  * 替换一个字符
- *
+ * <p>
  * 编辑距离
  *
  * @Author: daniel.hu
@@ -17,43 +17,24 @@ package com.jianghu.winter.algorithm;
 public class Distance {
 
     public static int getDistance(String si, String sj) {
-        if (si == null || sj == null) {
-            return 0;
-        }
-        int m = si.length();
-        int n = sj.length();
-        if (m == 0 && n == 0) {
-            return 0;
-        }
-        if (m == 0) {
-            return n;
-        }
-        if (n == 0) {
-            return m;
-        }
+        int m = si.length() + 1;
+        int n = sj.length() + 1;
         int[][] matrix = new int[m][n];
-        matrix[0][0] = si.charAt(0) == sj.charAt(0) ? 0 : 1;
-        for (int i = 1; i < m; i++) {
-            if (si.charAt(i) == sj.charAt(0)) {
-                matrix[i][0] = matrix[i - 1][0];
-            } else {
-                matrix[i][0] = matrix[i - 1][0] + 1;
-            }
+        matrix[0][0] = 0;
+        for (int i = 0; i < m; i++) {
+            matrix[i][0] = i;
         }
-        for (int j = 1; j < n; j++) {
-            if (si.charAt(0) == sj.charAt(j)) {
-                matrix[0][j] = matrix[0][j - 1];
-            } else {
-                matrix[0][j] = matrix[0][j - 1] + 1;
-            }
+        for (int i = 0; i < n; i++) {
+            matrix[0][i] = i;
         }
         for (int i = 1; i < m; i++) {
             for (int j = 1; j < n; j++) {
                 int min = Math.min(matrix[i - 1][j] + 1, matrix[i][j - 1] + 1);
-                matrix[i][j] = si.charAt(i) == sj.charAt(j) ? Math.min(min, matrix[i - 1][j - 1]) : Math.min(min, matrix[i - 1][j - 1] + 1);
+                matrix[i][j] = si.charAt(i - 1) == sj.charAt(j - 1)
+                        ? Math.min(min, matrix[i - 1][j - 1]) : Math.min(min, matrix[i - 1][j - 1] + 1);
             }
         }
-        return matrix[m-1][n-1];
+        return matrix[m - 1][n - 1];
     }
 
     public static void main(String[] args) {
